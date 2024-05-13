@@ -30,6 +30,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func AllUsers(w http.ResponseWriter, r *http.Request) {
 
+	AllUsers, err := db.Users()
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "Aplication/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(AllUsers)
 }
 func GetUserByID(w http.ResponseWriter, r *http.Request) {
 

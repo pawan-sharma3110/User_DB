@@ -52,3 +52,27 @@ func InserUser(user modle.User) int64 {
 	}
 	return id
 }
+func Users() (u []modle.User, err error) {
+	var users []modle.User
+	db := DbConection()
+	defer db.Close()
+	query := `SELECT id,first_name, last_name, gender, mobile, adult, created_at FROM users `
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user modle.User
+		err := rows.Scan(&user.UserId, &user.FirstName, &user.LastName, &user.Gender, &user.Mobile, &user.Adult, &user.CreatedAt)
+		if err != nil {
+			log.Fatal(err)
+		}
+		users = append(users, user)
+
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
