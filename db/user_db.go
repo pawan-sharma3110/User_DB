@@ -19,7 +19,7 @@ func DbConection() *sql.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
-	println("Connected to Database successfully..")
+
 	return db
 }
 
@@ -75,4 +75,36 @@ func Users() (u []modle.User, err error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func GetUser(userId int) (*modle.User, error) {
+	var user modle.User
+	db := DbConection()
+	defer db.Close()
+
+	row := db.QueryRow("SELECT id, first_name, last_name, gender, mobile, adult, created_at FROM users WHERE id = $1", userId)
+	err := row.Scan(&user.UserId, &user.FirstName, &user.LastName, &user.Gender, &user.Mobile, &user.Adult, &user.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func DeleteUserByID(userID int) error {
+	db := DbConection()
+	defer db.Close()
+	_, err := db.Exec("DELETE FROM users WHERE id = $1", userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func UpdateUser(userID int, user *modle.User) error {
+	db := DbConection()
+	_, err := db.Exec("UPDATE users SET first_name = $1, last_name = $2, gender = $3, mobile = $4, adult = $5, created_at = $6 WHERE id = $7",
+		user.FirstName, user.LastName, user.Gender, user.Mobile, user.Adult, user.CreatedAt, userID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
